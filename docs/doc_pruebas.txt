@@ -1,0 +1,2 @@
+archivo de prueba desarrollado en clase el 14-10-2026
+comandos usados: branch, switch -c [para crear una nueva rama]
