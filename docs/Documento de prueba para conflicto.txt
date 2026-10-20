@@ -1,0 +1,4 @@
+Documento de prueba para conflicto. creado por usuario A en rama conflicto 2, para rama-conflicto-6 con casos de pruena
+#ficacion   19/10/2026
+Fomato .txt
+git
