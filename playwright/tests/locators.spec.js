@@ -10,4 +10,4 @@ test('mapeo de elementos', async ({ page }) => {
   const bylabel = page.getByLabel('Choose a country'); //se usa por su etiqueta dentro del codigo
   await expect(bylabel).toBeVisible();
   await bylabel.selectOption('Japan'); //selecciona la opcion Japan del select  
-});
+}); 
