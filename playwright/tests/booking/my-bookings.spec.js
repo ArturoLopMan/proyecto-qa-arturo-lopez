@@ -1,33 +1,41 @@
-import { test, expect, DEFAULT_TICKETS } from '../fixture';
+import { test, expect } from '../fixture';
 
-test.describe('Reserva de evento (Book Now)', () => {
-  test('CP-BOOK-01: reserva de un evento disponible muestra la confirmación con el total correcto', async ({
-    page, eventsPage, bookingPage, bookingData,
+test.describe('Mis reservas', () => {
+  test('CP-BOOK-02: el detalle de una reserva creada muestra sus datos', async ({
+    page, bookingPage, myBookingsPage, bookingDetailPage, createdBooking,
   }) => {
-    const totalTickets = DEFAULT_TICKETS + bookingData.extraTickets;
+    // Desde la confirmación hacia "Mis reservas"
+    await bookingPage.viewMyBookingsButton.click();
+    await expect(page).toHaveURL(/\/bookings$/);
 
-    await eventsPage.bookFirstAvailableEvent();
-    await expect(page).toHaveURL(/\/events\/\d+/);
+    // La tarjeta de ESTA reserva
+    const bookingCard = myBookingsPage.getBookingCard(createdBooking.bookingRef);
+    await expect(bookingCard).toBeVisible();
+    await expect(bookingCard.getByText(`${createdBooking.tickets} tickets`)).toBeVisible();
+    await expect(bookingCard.getByText(`$${createdBooking.total}`, { exact: true })).toBeVisible();
 
-    // Estado inicial: 1 ticket y el precio de un ticket
-    await expect(bookingPage.ticketCountLabel).toHaveText(String(DEFAULT_TICKETS));
-    await expect(bookingPage.ticketPriceLabel).toHaveText(/\$\d+/);
-    const ticketPrice = await bookingPage.getTicketPrice();
-    const expectedTotal = ticketPrice * totalTickets;
+    const eventName = (await bookingCard.getByRole('heading', { level: 3 }).textContent()).trim();
+    const bookingId = (await bookingCard.getByTestId('booking-id').textContent()).trim().replace('#', '');
 
-    // Sumar tickets: cambia la cantidad, el precio por ticket no
-    await bookingPage.addTickets(bookingData.extraTickets);
-    await expect(bookingPage.ticketCountLabel).toHaveText(String(totalTickets));
-    await expect(bookingPage.ticketPriceLabel).toHaveText(`$${ticketPrice}`);
+    // Abrir el detalle
+    await myBookingsPage.openBookingDetails(createdBooking.bookingRef);
+    await expect(page).toHaveURL(new RegExp(`/bookings/${bookingId}$`));
 
-    await bookingPage.fillCustomerDetails(bookingData);
-    await bookingPage.confirmBooking();
+    // Cabecera
+    await expect(bookingDetailPage.statusBadge).toBeVisible();
+    await expect(bookingDetailPage.getEventTitle(eventName)).toBeVisible();
 
-    // Confirmación en la misma URL
-    await expect(page).toHaveURL(/\/events\/\d+/);
-    await expect(bookingPage.bookingRefLabel).toBeVisible();
-    await expect(bookingPage.getFieldValue('Customer')).toHaveText(bookingData.name);
-    await expect(bookingPage.getFieldValue('Tickets')).toHaveText(String(totalTickets));
-    await expect(bookingPage.getFieldValue('Total')).toHaveText(`$${expectedTotal}`);
+    // Customer Details
+    await expect(bookingDetailPage.getFieldValue('Name')).toHaveText(createdBooking.name);
+    await expect(bookingDetailPage.getFieldValue('Email')).toHaveText(createdBooking.email);
+    await expect(bookingDetailPage.getFieldValue('Phone')).toHaveText(createdBooking.phone);
+
+    // Payment Summary
+    await expect(bookingDetailPage.getFieldValue('Tickets')).toHaveText(String(createdBooking.tickets));
+    await expect(bookingDetailPage.getFieldValue('Price per ticket')).toHaveText(`$${createdBooking.ticketPrice}`);
+    await expect(bookingDetailPage.getFieldValue('Total Paid')).toHaveText(`$${createdBooking.total}`);
+
+    // Booking Information
+    await expect(bookingDetailPage.getFieldValue('Booking ID')).toHaveText(`#${bookingId}`);
   });
 });
