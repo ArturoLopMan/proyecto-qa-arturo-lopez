@@ -5,7 +5,11 @@ import { BookingPage } from '../pages/BookingPage';
 import { MyBookingsPage } from '../pages/MyBookingsPage';
 import { BookingDetailPage } from '../pages/BookingDetailPage';
 
+// El formulario de reserva arranca con 1 ticket
+export const DEFAULT_TICKETS = 1;
+
 export const test = base.extend({
+  // Credenciales desde .env, con validación temprana
   credentials: async ({}, use) => {
     const user = process.env.LOGIN_USER;
     const password = process.env.LOGIN_PASSWORD;
@@ -15,59 +19,61 @@ export const test = base.extend({
     await use({ user, password });
   },
 
+  // Página de login abierta
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
-    await loginPage.abrirLogin();
+    await loginPage.openLogin();
     await use(loginPage);
   },
 
-  paginaAutenticada: async ({ page, loginPage, credentials }, use) => {
-    await loginPage.iniciarSesion(credentials.user, credentials.password);
-    await expect(loginPage.messageFeaturedEvents).toBeVisible();
+  // Sesión iniciada: reutiliza loginPage y credentials
+  authenticatedPage: async ({ page, loginPage, credentials }, use) => {
+    await loginPage.login(credentials.user, credentials.password);
+    await expect(loginPage.featuredEventsText).toBeVisible();
     await use(page);
   },
 
-  eventsPage: async ({ paginaAutenticada }, use) => {
-    await use(new EventsPage(paginaAutenticada));
+  eventsPage: async ({ authenticatedPage }, use) => {
+    await use(new EventsPage(authenticatedPage));
   },
 
-  bookingPage: async ({ paginaAutenticada }, use) => {
-    await use(new BookingPage(paginaAutenticada));
+  bookingPage: async ({ authenticatedPage }, use) => {
+    await use(new BookingPage(authenticatedPage));
   },
 
-  myBookingsPage: async ({ paginaAutenticada }, use) => {
-    await use(new MyBookingsPage(paginaAutenticada));
+  myBookingsPage: async ({ authenticatedPage }, use) => {
+    await use(new MyBookingsPage(authenticatedPage));
   },
 
-  bookingDetailPage: async ({ paginaAutenticada }, use) => {
-    await use(new BookingDetailPage(paginaAutenticada));
+  bookingDetailPage: async ({ authenticatedPage }, use) => {
+    await use(new BookingDetailPage(authenticatedPage));
   },
 
   // Datos de la reserva (se pueden sobrescribir en un test)
-  datosReserva: async ({}, use) => {
+  bookingData: async ({}, use) => {
     await use({
-      nombre: 'Arturo Lopez',
+      name: 'Arturo Lopez',
       email: 'arturoqa@gmail.com',
-      telefono: '+51 999888111',
-      ticketsExtra: 1,
+      phone: '+51 999888111',
+      extraTickets: 1,
     });
   },
 
   // Precondición: deja una reserva hecha y entrega sus datos
-  reservaCreada: async ({ eventsPage, bookingPage, datosReserva }, use) => {
-    await eventsPage.reservarPrimerEventoDisponible();
-    await expect(bookingPage.labelPrecioTicket).toHaveText(/\$\d+/);
-    const precioTicket = await bookingPage.leerPrecioTicket();
+  createdBooking: async ({ eventsPage, bookingPage, bookingData }, use) => {
+    await eventsPage.bookFirstAvailableEvent();
+    await expect(bookingPage.ticketPriceLabel).toHaveText(/\$\d+/);
+    const ticketPrice = await bookingPage.getTicketPrice();
 
-    await bookingPage.agregarTickets(datosReserva.ticketsExtra);
-    await bookingPage.llenarDatos(datosReserva);
-    await bookingPage.confirmar();
+    await bookingPage.addTickets(bookingData.extraTickets);
+    await bookingPage.fillCustomerDetails(bookingData);
+    await bookingPage.confirmBooking();
 
-    await expect(bookingPage.bookingRef).toBeVisible();
-    const ref = (await bookingPage.bookingRef.textContent()).trim();
-    const tickets = 1 + datosReserva.ticketsExtra;
+    await expect(bookingPage.bookingRefLabel).toBeVisible();
+    const bookingRef = (await bookingPage.bookingRefLabel.textContent()).trim();
+    const tickets = DEFAULT_TICKETS + bookingData.extraTickets;
 
-    await use({ ...datosReserva, ref, tickets, precioTicket, total: precioTicket * tickets });
+    await use({ ...bookingData, bookingRef, tickets, ticketPrice, total: ticketPrice * tickets });
   },
 });
 

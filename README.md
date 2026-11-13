@@ -52,7 +52,7 @@ proyecto-qa-arturo-lopez/
 | `tests/fixture.js` | Fixtures compartidos |
 | `tests/auth/login.spec.js` | Login correcto, credenciales incorrectas y campos vacíos |
 | `tests/booking/booking.spec.js` | Reserva de un evento disponible y su confirmación |
-| `tests/booking/mis-reservas.spec.js` | Detalle de una reserva recién creada |
+| `tests/booking/my-bookings.spec.js` | Detalle de una reserva recién creada |
 | `tests/ejercicios/` | Ejercicios de práctica sobre Toolshop (no son parte de EventHub) |
 
 ## Flujos cubiertos por la automatización
@@ -61,21 +61,21 @@ proyecto-qa-arturo-lopez/
 |---|---|---|
 | Inicio de sesión | `tests/auth/login.spec.js` | 3 |
 | Reserva de un evento («Book Now») | `tests/booking/booking.spec.js` | 1 |
-| Mis reservas y detalle de reserva | `tests/booking/mis-reservas.spec.js` | 1 |
+| Mis reservas y detalle de reserva | `tests/booking/my-bookings.spec.js` | 1 |
 
 ### Inicio de sesión
 
 | Prueba | Qué verifica |
 |---|---|
-| Inicio de sesión correcto | Con un usuario válido se muestra la sección «Featured Events» |
-| Credenciales incorrectas | Aparece el aviso de email o contraseña inválidos en el contenedor de avisos |
-| Campos vacíos | Se muestran «Enter a valid email» y «Password must be at least 6 characters» |
+| CP-AUTH-01: usuario válido inicia sesión y ve los eventos destacados | Con un usuario válido se muestra la sección «Featured Events» |
+| CP-AUTH-02: credenciales inválidas muestran mensaje de error | Aparece el aviso de email o contraseña inválidos en el contenedor de avisos |
+| CP-AUTH-03: campos vacíos muestran mensajes de validación | Se muestran «Enter a valid email» y «Password must be at least 6 characters» |
 
 ### Reserva de un evento («Book Now»)
 
-Caso manual relacionado: TC-M04-01. Requisito de la matriz: R14.
+Prueba: **CP-BOOK-01: reserva de un evento disponible muestra la confirmación con el total correcto**. Caso manual relacionado: TC-M04-01. Requisito de la matriz: R14.
 
-1. Inicia sesión de forma automática con el fixture `paginaAutenticada`.
+1. Inicia sesión de forma automática con el fixture `authenticatedPage`.
 2. Abre el primer evento disponible, es decir, con el enlace «Book Now» habilitado, y comprueba la URL `/events/{id}`.
 3. Verifica el estado inicial: 1 ticket y el precio de un ticket.
 4. Suma 1 ticket (quedan 2) y comprueba que el precio por ticket no cambia.
@@ -84,9 +84,9 @@ Caso manual relacionado: TC-M04-01. Requisito de la matriz: R14.
 
 ### Mis reservas y detalle de reserva
 
-Requisito de la matriz: R16.
+Prueba: **CP-BOOK-02: el detalle de una reserva creada muestra sus datos**. Requisito de la matriz: R16.
 
-1. El fixture `reservaCreada` deja una reserva hecha y entrega su referencia, así que la prueba no depende de reservas previas.
+1. El fixture `createdBooking` deja una reserva hecha y entrega su referencia, así que la prueba no depende de reservas previas.
 2. Pulsa «View My Bookings» y comprueba la URL `/bookings`.
 3. Localiza la tarjeta de **esa** reserva por su referencia y verifica sus tickets y su total.
 4. Abre «View Details» y comprueba la URL `/bookings/{id}`.
@@ -95,11 +95,11 @@ Requisito de la matriz: R16.
 ### Cómo se encadenan los fixtures
 
 ```
-credentials → loginPage → paginaAutenticada → eventsPage
+credentials → loginPage → authenticatedPage → eventsPage
                                             → bookingPage
                                             → myBookingsPage
                                             → bookingDetailPage
-datosReserva + eventsPage + bookingPage → reservaCreada
+bookingData + eventsPage + bookingPage → createdBooking
 ```
 
 Cada prueba pide solo lo que necesita y Playwright prepara el resto en orden.
@@ -123,12 +123,26 @@ En `tests/ejercicios/` hay ejercicios sobre otra aplicación, Toolshop (practice
 - **Page Object Model:** un Page Object por pantalla, con localizadores y acciones separados de las pruebas.
 - **Fixtures** (`tests/fixture.js`):
   - `credentials`: usuario y contraseña desde `.env`, con validación temprana.
-  - `loginPage` y `paginaAutenticada`: login abierto y sesión iniciada.
+  - `loginPage` y `authenticatedPage`: login abierto y sesión iniciada.
   - `eventsPage`, `bookingPage`, `myBookingsPage` y `bookingDetailPage`: Page Objects listos para usar.
-  - `datosReserva` y `reservaCreada`: precondición que deja una reserva hecha y entrega sus datos.
+  - `bookingData` y `createdBooking`: datos de prueba y precondición que deja una reserva hecha y entrega sus datos.
+  - `DEFAULT_TICKETS`: constante compartida con la cantidad inicial de tickets del formulario.
 - **`describe` y aserciones con reintento** de Playwright, sin `waitForTimeout` ni `expect(await ...)`.
 - **Orden de localizadores:** `getByRole`, `getByLabel`, `getByPlaceholder`, `getByText` y `getByTestId`.
 - **Datos fuera del código:** las credenciales viven en `.env`, que no se versiona.
+
+### Convención de nombres
+
+| Elemento | Regla | Ejemplo del proyecto |
+|---|---|---|
+| Test | Español, con ID y resultado | `CP-AUTH-02: credenciales inválidas muestran mensaje de error` |
+| Archivo de test | Inglés, minúsculas, `.spec.js` | `my-bookings.spec.js` |
+| Clase y archivo | Inglés, PascalCase | `BookingPage.js` |
+| Método | Inglés, verbo + objeto, camelCase | `fillCustomerDetails()` |
+| Variable | Inglés, camelCase, descriptiva | `confirmBookingButton` |
+| Constante | Inglés, MAYÚSCULAS | `DEFAULT_TICKETS` |
+
+Prefijos de ID: `CP-AUTH` para inicio de sesión y `CP-BOOK` para reservas.
 
 ## Cómo ejecutar
 
@@ -169,8 +183,8 @@ Ejecútalos siempre desde la carpeta `playwright`, donde está `playwright.confi
 npx playwright test                        # todos los tests
 npx playwright test tests/auth             # solo login
 npx playwright test tests/booking          # reserva y mis reservas
-npx playwright test mis-reservas --headed  # un archivo, viendo el navegador
-npx playwright test mis-reservas --debug   # paso a paso con el Inspector
+npx playwright test my-bookings --headed   # un archivo, viendo el navegador
+npx playwright test my-bookings --debug    # paso a paso con el Inspector
 npx playwright show-report                 # abrir el reporte HTML
 ```
 

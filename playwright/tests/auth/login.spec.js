@@ -29,20 +29,20 @@ test.describe('InicioSesion', () => {
 });
 */
 
-test.describe('InicioSesion', () => {
-  test('inicio de sesion correcto', async ({ loginPage, credentials }) => {
-    await loginPage.iniciarSesion(credentials.user, credentials.password);
-    await expect(loginPage.messageFeaturedEvents).toBeVisible();
+test.describe('Inicio de sesión', () => {
+  test('CP-AUTH-01: usuario válido inicia sesión y ve los eventos destacados', async ({ loginPage, credentials }) => {
+    await loginPage.login(credentials.user, credentials.password);
+    await expect(loginPage.featuredEventsText).toBeVisible();
   });
-
-  test('inicio de sesion con credenciales incorrectas', async ({ loginPage }) => {
-    await loginPage.iniciarSesion('correo@gmail.com', 'incorrectpassword');
-    await expect(loginPage.messageInvalidCredentials).toBeVisible();
+ 
+  test('CP-AUTH-02: credenciales inválidas muestran mensaje de error', async ({ loginPage }) => {
+    await loginPage.login('correo@gmail.com', 'incorrectpassword');
+    await expect(loginPage.invalidCredentialsMessage).toBeVisible();
   });
-
-  test('inicio de sesion con campos vacios', async ({ loginPage }) => {
-    await loginPage.buttonSignIn.click();
-    await expect(loginPage.messageInvalidEmail).toBeVisible();
-    await expect(loginPage.messageInvalidPassword).toBeVisible();
+ 
+  test('CP-AUTH-03: campos vacíos muestran mensajes de validación', async ({ loginPage }) => {
+    await loginPage.signInButton.click();
+    await expect(loginPage.invalidEmailMessage).toBeVisible();
+    await expect(loginPage.invalidPasswordMessage).toBeVisible();
   });
 });

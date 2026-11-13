@@ -3,29 +3,31 @@ export class LoginPage {
     this.page = page;
 
     // Campos del formulario
-    this.inputEmail = page.getByRole('textbox', { name: 'Email' });
-    this.inputPassword = page.getByRole('textbox', { name: 'Password' });
+    this.emailInput = page.getByRole('textbox', { name: 'Email' });
+    this.passwordInput = page.getByRole('textbox', { name: 'Password' });
 
     // Botón
-    this.buttonSignIn = page.getByRole('button', { name: 'Sign In' });
+    this.signInButton = page.getByRole('button', { name: 'Sign In' });
+
+    // Indicador de login correcto
+    this.featuredEventsText = page.getByText('Featured Events');
 
     // Mensajes de validación
-    this.messageFeaturedEvents = page.getByText('Featured Events');
-    this.messageInvalidCredentials = page.locator('[aria-live="polite"]')
+    this.invalidCredentialsMessage = page.locator('[aria-live="polite"]')
       .getByText(/invalid email or password/i);
-    this.messageInvalidEmail = page.getByText('Enter a valid email');
-    this.messageInvalidPassword = page.getByText('Password must be at least 6 characters');
+    this.invalidEmailMessage = page.getByText('Enter a valid email');
+    this.invalidPasswordMessage = page.getByText('Password must be at least 6 characters');
   }
 
-  // Abrir página de login
-  async abrirLogin() {
+  // Abrir la página de login
+  async openLogin() {
     await this.page.goto('/login');
   }
 
   // Iniciar sesión
-  async iniciarSesion(email, password) {
-    await this.inputEmail.fill(email);
-    await this.inputPassword.fill(password);
-    await this.buttonSignIn.click();
+  async login(email, password) {
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.signInButton.click();
   }
 }

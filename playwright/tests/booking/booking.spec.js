@@ -1,39 +1,33 @@
-import { test, expect } from '../fixture';
-
-const reserva = {
-  nombre: 'Arturo Lopez',
-  email: 'Arturo.qa@gmail.com',
-  telefono: '+51 999888111',
-};
-
-const TICKETS_POR_DEFECTO = 1;
-const TICKETS_EXTRA = 1;
-const TOTAL_TICKETS = TICKETS_POR_DEFECTO + TICKETS_EXTRA;
+import { test, expect, DEFAULT_TICKETS } from '../fixture';
 
 test.describe('Reserva de evento (Book Now)', () => {
-  test('reservar un evento disponible y validar la confirmacion', async ({ page, eventsPage, bookingPage }) => {
-    await eventsPage.reservarPrimerEventoDisponible();
+  test('CP-BOOK-01: reserva de un evento disponible muestra la confirmación con el total correcto', async ({
+    page, eventsPage, bookingPage, bookingData,
+  }) => {
+    const totalTickets = DEFAULT_TICKETS + bookingData.extraTickets;
+
+    await eventsPage.bookFirstAvailableEvent();
     await expect(page).toHaveURL(/\/events\/\d+/);
 
     // Estado inicial: 1 ticket y el precio de un ticket
-    await expect(bookingPage.labelTicketCount).toHaveText(String(TICKETS_POR_DEFECTO));
-    await expect(bookingPage.labelPrecioTicket).toHaveText(/\$\d+/);
-    const precioTicket = await bookingPage.leerPrecioTicket();
-    const totalEsperado = precioTicket * TOTAL_TICKETS;
+    await expect(bookingPage.ticketCountLabel).toHaveText(String(DEFAULT_TICKETS));
+    await expect(bookingPage.ticketPriceLabel).toHaveText(/\$\d+/);
+    const ticketPrice = await bookingPage.getTicketPrice();
+    const expectedTotal = ticketPrice * totalTickets;
 
     // Sumar tickets: cambia la cantidad, el precio por ticket no
-    await bookingPage.agregarTickets(TICKETS_EXTRA);
-    await expect(bookingPage.labelTicketCount).toHaveText(String(TOTAL_TICKETS));
-    await expect(bookingPage.labelPrecioTicket).toHaveText(`$${precioTicket}`);
+    await bookingPage.addTickets(bookingData.extraTickets);
+    await expect(bookingPage.ticketCountLabel).toHaveText(String(totalTickets));
+    await expect(bookingPage.ticketPriceLabel).toHaveText(`$${ticketPrice}`);
 
-    await bookingPage.llenarDatos(reserva);
-    await bookingPage.confirmar();
+    await bookingPage.fillCustomerDetails(bookingData);
+    await bookingPage.confirmBooking();
 
     // Confirmación en la misma URL
     await expect(page).toHaveURL(/\/events\/\d+/);
-    await expect(bookingPage.bookingRef).toBeVisible();
-    await expect(bookingPage.valorDe('Customer')).toHaveText(reserva.nombre);
-    await expect(bookingPage.valorDe('Tickets')).toHaveText(String(TOTAL_TICKETS));
-    await expect(bookingPage.valorDe('Total')).toHaveText(`$${totalEsperado}`);
+    await expect(bookingPage.bookingRefLabel).toBeVisible();
+    await expect(bookingPage.getFieldValue('Customer')).toHaveText(bookingData.name);
+    await expect(bookingPage.getFieldValue('Tickets')).toHaveText(String(totalTickets));
+    await expect(bookingPage.getFieldValue('Total')).toHaveText(`$${expectedTotal}`);
   });
 });
