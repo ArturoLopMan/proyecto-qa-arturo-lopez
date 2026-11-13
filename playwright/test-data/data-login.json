@@ -1,0 +1,15 @@
+[
+{
+    "id": "CP-AUTH-02",
+    "name": "credenciales inválidas muestran mensaje de error",
+    "user": "correo@gmail.com",
+    "password": "incorrectpassword",
+    "error": "Invalid email or password"
+  },
+  {
+    "id": "CP-AUTH-04",
+    "name": "usuario válido con contraseña incorrecta muestra mensaje de error",
+    "password": "incorrectpassword",
+    "error": "Invalid email or password"
+  }
+]
