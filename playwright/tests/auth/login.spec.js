@@ -1,20 +1,5 @@
 import { test, expect } from '../fixture';
-
-const INVALID_LOGINS = [
-  {
-    id: 'CP-AUTH-02',
-    name: 'credenciales inválidas muestran mensaje de error',
-    user: 'correo@gmail.com',
-    password: 'incorrectpassword',
-    error: 'Invalid email or password',
-  },
-  {
-    id: 'CP-AUTH-04',
-    name: 'usuario válido con contraseña incorrecta muestra mensaje de error',
-    password: 'incorrectpassword',
-    error: 'Invalid email or password',
-  },
-];
+import INVALID_LOGINS from '../../test-data/data-login.json';
 
 test.describe('Inicio de sesión', () => {
   test('CP-AUTH-01: usuario válido inicia sesión y ve los eventos destacados', async ({ loginPage, credentials }) => {
