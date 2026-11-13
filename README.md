@@ -1,3 +1,5 @@
+# proyecto-qa-arturo-lopez
+Proyecto final del curso del QA Automatizador
 # Proyecto QA – EventHub
 
 Proyecto académico del curso de **QA Automatizador**. Contiene el análisis, la documentación de pruebas y la automatización con **Playwright y JavaScript** de [EventHub](https://eventhub.rahulshettyacademy.com/), una plataforma de gestión y reserva de eventos creada para practicar testing. Su documentación de API está en <https://api.eventhub.rahulshettyacademy.com/api/docs/>.
@@ -52,7 +54,7 @@ proyecto-qa-arturo-lopez/
 | `tests/fixture.js` | Fixtures compartidos |
 | `tests/auth/login.spec.js` | Login correcto, credenciales incorrectas y campos vacíos |
 | `tests/booking/booking.spec.js` | Reserva de un evento disponible y su confirmación |
-| `tests/booking/my-bookings.spec.js` | Detalle de una reserva recién creada |
+| `tests/booking/mis-reservas.spec.js` | Detalle de una reserva recién creada |
 | `tests/ejercicios/` | Ejercicios de práctica sobre Toolshop (no son parte de EventHub) |
 
 ## Flujos cubiertos por la automatización
@@ -61,7 +63,7 @@ proyecto-qa-arturo-lopez/
 |---|---|---|
 | Inicio de sesión | `tests/auth/login.spec.js` | 3 |
 | Reserva de un evento («Book Now») | `tests/booking/booking.spec.js` | 1 |
-| Mis reservas y detalle de reserva | `tests/booking/my-bookings.spec.js` | 1 |
+| Mis reservas y detalle de reserva | `tests/booking/mis-reservas.spec.js` | 1 |
 
 ### Inicio de sesión
 
