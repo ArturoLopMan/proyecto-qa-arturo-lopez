@@ -1,15 +1,15 @@
 export class MyBookingsPage {
   constructor(page) {
     this.page = page;
-    this.tarjetas = page.getByTestId('booking-card');
+    this.bookingCards = page.getByTestId('booking-card');
   }
 
-  // La tarjeta que contiene esa referencia de reserva
-  tarjetaDe(ref) {
-    return this.tarjetas.filter({ has: this.page.getByText(ref, { exact: true }) });
+  // Tarjeta que contiene esa referencia de reserva
+  getBookingCard(bookingRef) {
+    return this.bookingCards.filter({ has: this.page.getByText(bookingRef, { exact: true }) });
   }
 
-  async abrirDetalle(ref) {
-    await this.tarjetaDe(ref).getByRole('button', { name: 'View Details' }).click();
+  async openBookingDetails(bookingRef) {
+    await this.getBookingCard(bookingRef).getByRole('button', { name: 'View Details' }).click();
   }
 }

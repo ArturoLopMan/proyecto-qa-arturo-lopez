@@ -1,18 +1,18 @@
 export class BookingDetailPage {
   constructor(page) {
     this.page = page;
-    this.badgeEstado = page.getByText('confirmed', { exact: true });
-    this.buttonCancelBooking = page.getByTestId('cancel-booking-btn');
+    this.statusBadge = page.getByText('confirmed', { exact: true });
+    this.cancelBookingButton = page.getByTestId('cancel-booking-btn');
   }
 
-  titulo(nombreEvento) {
-    return this.page.getByRole('heading', { name: nombreEvento });
+  getEventTitle(eventName) {
+    return this.page.getByRole('heading', { name: eventName });
   }
 
   // Valor que aparece junto a una etiqueta (Name, Email, Tickets, Total Paid...)
-  valorDe(etiqueta) {
+  getFieldValue(label) {
     return this.page
-      .getByText(etiqueta, { exact: true })
+      .getByText(label, { exact: true })
       .locator('xpath=following-sibling::*[1]');
   }
 }

@@ -2,45 +2,45 @@ export class BookingPage {
   constructor(page) {
     this.page = page;
 
-    // Formulario
-    this.buttonAddTicket = page.getByRole('button', { name: '+', exact: true });
-    this.labelTicketCount = page.locator('#ticket-count');
-    this.labelPrecioTicket = page.locator('span.text-2xl.font-bold'); // precio de UN ticket
-    this.inputFullName = page.getByRole('textbox', { name: 'Full name' });
-    this.inputEmail = page.getByRole('textbox', { name: 'Email' });
-    this.inputPhone = page.getByRole('textbox', { name: 'Phone' });
-    this.buttonConfirm = page.getByRole('button', { name: 'Confirm Booking' });
+    // Formulario de reserva
+    this.addTicketButton = page.getByRole('button', { name: '+', exact: true });
+    this.ticketCountLabel = page.locator('#ticket-count');
+    this.ticketPriceLabel = page.locator('span.text-2xl.font-bold'); // precio de UN ticket
+    this.fullNameInput = page.getByRole('textbox', { name: 'Full name' });
+    this.emailInput = page.getByRole('textbox', { name: 'Email' });
+    this.phoneInput = page.getByRole('textbox', { name: 'Phone' });
+    this.confirmBookingButton = page.getByRole('button', { name: 'Confirm Booking' });
 
     // Confirmación
-    this.bookingRef = page.locator('.booking-ref');
-    this.buttonViewMyBookings = page.getByRole('button', { name: 'View My Bookings' });
+    this.bookingRefLabel = page.locator('.booking-ref');
+    this.viewMyBookingsButton = page.getByRole('button', { name: 'View My Bookings' });
   }
 
-  async agregarTickets(cantidad) {
-    for (let i = 0; i < cantidad; i++) {
-      await this.buttonAddTicket.click();
+  async addTickets(quantity) {
+    for (let i = 0; i < quantity; i++) {
+      await this.addTicketButton.click();
     }
   }
 
-  async leerPrecioTicket() {
-    const texto = await this.labelPrecioTicket.textContent();
-    return Number(texto.replace(/[^0-9.]/g, ''));
+  async getTicketPrice() {
+    const priceText = await this.ticketPriceLabel.textContent();
+    return Number(priceText.replace(/[^0-9.]/g, ''));
   }
 
-  async llenarDatos({ nombre, email, telefono }) {
-    await this.inputFullName.fill(nombre);
-    await this.inputEmail.fill(email);
-    await this.inputPhone.fill(telefono);
+  async fillCustomerDetails({ name, email, phone }) {
+    await this.fullNameInput.fill(name);
+    await this.emailInput.fill(email);
+    await this.phoneInput.fill(phone);
   }
 
-  async confirmar() {
-    await this.buttonConfirm.click();
+  async confirmBooking() {
+    await this.confirmBookingButton.click();
   }
 
   // Valor que aparece junto a una etiqueta de la confirmación (Customer, Tickets, Total)
-  valorDe(etiqueta) {
+  getFieldValue(label) {
     return this.page
-      .getByText(etiqueta, { exact: true })
+      .getByText(label, { exact: true })
       .locator('xpath=following-sibling::*[1]');
   }
 }
