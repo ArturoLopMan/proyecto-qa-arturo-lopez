@@ -7,16 +7,19 @@ import { BookingDetailPage } from '../pages/BookingDetailPage';
 
 // El formulario de reserva arranca con 1 ticket
 export const DEFAULT_TICKETS = 1;
+const REQUIRED_ENV_VARS = ['LOGIN_USER', 'LOGIN_PASSWORD'];
 
 export const test = base.extend({
   // Credenciales desde .env, con validación temprana
   credentials: async ({}, use) => {
-    const user = process.env.LOGIN_USER;
-    const password = process.env.LOGIN_PASSWORD;
-    if (!user || !password) {
-      throw new Error('Faltan LOGIN_USER o LOGIN_PASSWORD en el archivo .env');
+    const missingVars = REQUIRED_ENV_VARS.filter((name) => !process.env[name]?.trim());
+    if (missingVars.length > 0) {
+      throw new Error(`Faltan variables de entorno en el archivo .env: ${missingVars.join(', ')}`);
     }
-    await use({ user, password });
+    await use({
+      user: process.env.LOGIN_USER,
+      password: process.env.LOGIN_PASSWORD,
+    });
   },
 
   // Página de login abierta
