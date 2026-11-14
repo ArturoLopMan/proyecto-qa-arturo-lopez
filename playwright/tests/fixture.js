@@ -10,8 +10,9 @@ export const DEFAULT_TICKETS = 1;
 const REQUIRED_ENV_VARS = ['LOGIN_USER', 'LOGIN_PASSWORD'];
 
 export const test = base.extend({
-  // Credenciales desde .env, con validación temprana
-  credentials: async ({}, use) => {
+  // Credenciales desde .env
+  credentials: [
+  async ({}, use) => {
     const missingVars = REQUIRED_ENV_VARS.filter((name) => !process.env[name]?.trim());
     if (missingVars.length > 0) {
       throw new Error(`Faltan variables de entorno en el archivo .env: ${missingVars.join(', ')}`);
@@ -21,6 +22,36 @@ export const test = base.extend({
       password: process.env.LOGIN_PASSWORD,
     });
   },
+  { scope: 'worker' },
+
+],
+
+// Sesión de EventHub: se inicia sesión UNA vez por worker y se guarda en memoria.
+// EventHub guarda el token en localStorage (eventhub_token) y storageState lo captura.
+eventhubStorageState: [
+  async ({ browser, credentials }, use) => {
+    const context = await browser.newContext({ baseURL: process.env.BASE_URL });
+    const page = await context.newPage();
+    const loginPage = new LoginPage(page);
+
+    await loginPage.openLogin();
+    await loginPage.login(credentials.user, credentials.password);
+    await expect(loginPage.featuredEventsText).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem('eventhub_token')))
+      .toBeTruthy();
+
+    const state = await context.storageState();
+    await context.close();
+    await use(state);
+  },
+  { scope: 'worker' },
+],
+
+// Cada test arranca con la sesión guardada
+storageState: async ({ eventhubStorageState }, use) => {
+  await use(eventhubStorageState);
+},
 
   // Página de login abierta
   loginPage: async ({ page }, use) => {
@@ -30,12 +61,10 @@ export const test = base.extend({
   },
 
   // Sesión iniciada: reutiliza loginPage y credentials
-  authenticatedPage: async ({ page, loginPage, credentials }, use) => {
-    await loginPage.login(credentials.user, credentials.password);
-    await expect(loginPage.featuredEventsText).toBeVisible();
-    await use(page);
-  },
-
+  authenticatedPage: async ({ page }, use) => {
+  await page.goto('/');
+  await use(page);
+},
   eventsPage: async ({ authenticatedPage }, use) => {
     await use(new EventsPage(authenticatedPage));
   },

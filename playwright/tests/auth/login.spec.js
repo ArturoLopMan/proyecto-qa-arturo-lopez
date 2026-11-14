@@ -2,6 +2,8 @@ import { test, expect } from '../fixture';
 import INVALID_LOGINS from '../../test-data/data-login.json';
 
 test.describe('Inicio de sesión', () => {
+  // Estos tests prueban el login (empiezan SIN sesión guardada)
+  test.use({ storageState: { cookies: [], origins: [] } });
   test('CP-AUTH-01: usuario válido inicia sesión y ve los eventos destacados', async ({ loginPage, credentials }) => {
     await loginPage.login(credentials.user, credentials.password);
     await expect(loginPage.featuredEventsText).toBeVisible();
