@@ -4,6 +4,9 @@ import { EventsPage } from '../pages/EventsPage';
 import { BookingPage } from '../pages/BookingPage';
 import { MyBookingsPage } from '../pages/MyBookingsPage';
 import { BookingDetailPage } from '../pages/BookingDetailPage';
+import NEW_EVENT from '../test-data/new-event.json';
+import { getFutureDateTime } from './utils/date-helpers';
+import { ManageEventsPage } from '../pages/ManageEventsPage';
 
 // El formulario de reserva arranca con 1 ticket
 export const DEFAULT_TICKETS = 1;
@@ -25,6 +28,17 @@ export const test = base.extend({
   { scope: 'worker' },
 
 ],
+newEventData: async ({}, use) => {
+  await use({
+    ...NEW_EVENT,
+    title: `${NEW_EVENT.titlePrefix} ${Date.now()}`,
+    dateTime: getFutureDateTime(NEW_EVENT.daysAhead),
+  });
+},
+manageEventsPage: async ({ authenticatedPage }, use) => {
+  await use(new ManageEventsPage(authenticatedPage));
+},
+
 
 // Sesión de EventHub: se inicia sesión UNA vez por worker y se guarda en memoria.
 // EventHub guarda el token en localStorage (eventhub_token) y storageState lo captura.
@@ -107,6 +121,7 @@ storageState: async ({ eventhubStorageState }, use) => {
 
     await use({ ...bookingData, bookingRef, tickets, ticketPrice, total: ticketPrice * tickets });
   },
+
 });
 
 export { expect };
