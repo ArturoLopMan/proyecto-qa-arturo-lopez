@@ -1,0 +1,50 @@
+export class ManageEventsPage {
+  constructor(page) {
+    this.page = page;
+
+    // Formulario de creación
+    this.titleInput = page.getByTestId('event-title-input');
+    this.descriptionInput = page.getByPlaceholder('Describe the event…');
+    this.categorySelect = page.getByLabel('Category');
+    this.cityInput = page.getByRole('textbox', { name: 'City' });
+    this.venueInput = page.getByRole('textbox', { name: 'Venue' });
+    this.dateTimeInput = page.getByLabel('Event Date & Time');
+    this.priceInput = page.getByRole('spinbutton', { name: 'Price' });
+    this.totalSeatsInput = page.getByRole('spinbutton', { name: 'Total Seats' });
+    this.addEventButton = page.getByTestId('add-event-btn');
+
+    // Avisos y grilla
+    this.notificationArea = page.locator('[aria-live="polite"]');
+    this.eventRows = page.getByTestId('event-table-row');
+
+    // Modal de eliminación
+    this.deleteDialog = page.getByRole('dialog', { name: 'Delete this event?' });
+    this.confirmDeleteButton = this.deleteDialog.getByTestId('confirm-dialog-yes');
+  }
+
+  async openManageEvents() {
+    await this.page.goto('/admin/events');
+  }
+
+  async createEvent({ title, description, category, city, venue, dateTime, price, totalSeats }) {
+    await this.titleInput.fill(title);
+    await this.descriptionInput.fill(description);
+    await this.categorySelect.selectOption(category);
+    await this.cityInput.fill(city);
+    await this.venueInput.fill(venue);
+    await this.dateTimeInput.fill(dateTime);
+    await this.priceInput.fill(String(price));
+    await this.totalSeatsInput.fill(String(totalSeats));
+    await this.addEventButton.click();
+  }
+
+  // Fila de la grilla con ese título exacto
+  getEventRow(title) {
+    return this.eventRows.filter({ has: this.page.getByText(title, { exact: true }) });
+  }
+
+  async deleteEvent(title) {
+    await this.getEventRow(title).getByTestId('delete-event-btn').click();
+    await this.confirmDeleteButton.click();
+  }
+}

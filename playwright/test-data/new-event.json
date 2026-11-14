@@ -1,0 +1,10 @@
+{
+  "titlePrefix": "QA Evento",
+  "description": "Evento creado por automatización con Playwright",
+  "category": "Festival",
+  "city": "Lima",
+  "venue": "Estadio Nacional",
+  "price": 50,
+  "totalSeats": 100,
+  "daysAhead": 30
+}
