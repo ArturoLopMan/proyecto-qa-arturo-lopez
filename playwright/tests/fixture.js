@@ -28,12 +28,17 @@ export const test = base.extend({
   { scope: 'worker' },
 
 ],
-newEventData: async ({}, use) => {
-  await use({
+newEventData: async ({ manageEventsPage }, use) => {
+  const eventData = {
     ...NEW_EVENT,
     title: `${NEW_EVENT.titlePrefix} ${Date.now()}`,
     dateTime: getFutureDateTime(NEW_EVENT.daysAhead),
-  });
+  };
+
+  await use(eventData);
+
+  // Limpieza: se ejecuta después del test, pase o falle
+  await manageEventsPage.deleteEventIfExists(eventData.title);
 },
 manageEventsPage: async ({ authenticatedPage }, use) => {
   await use(new ManageEventsPage(authenticatedPage));
