@@ -47,4 +47,16 @@ export class ManageEventsPage {
     await this.getEventRow(title).getByTestId('delete-event-btn').click();
     await this.confirmDeleteButton.click();
   }
+  // Limpieza: elimina el evento solo si existe (por si el test falló antes de crearlo)
+async deleteEventIfExists(title) {
+  await this.openManageEvents();
+  const eventRow = this.getEventRow(title);
+  try {
+    await eventRow.waitFor({ state: 'visible', timeout: 5000 });
+  } catch {
+    return; // el evento no llegó a crearse
+  }
+  await this.deleteEvent(title);
+  await eventRow.waitFor({ state: 'detached' });
+}
 }
