@@ -1,4 +1,5 @@
 import { test, expect } from '../fixture';
+import { formatPrice } from '../utils/price-helpers';
 
 test.describe('Gestión de eventos', () => {
   test('CP-EVENT-01: evento creado con datos válidos aparece en la grilla y se puede eliminar', async ({
@@ -12,7 +13,7 @@ test.describe('Gestión de eventos', () => {
     await expect(eventRow).toBeVisible();
     await expect(eventRow).toContainText(newEventData.category);
     await expect(eventRow).toContainText(newEventData.city);
-    await expect(eventRow).toContainText(`$${newEventData.price}`);
+    await expect(eventRow).toContainText(formatPrice(newEventData.price));
     await expect(eventRow).toContainText(`${newEventData.totalSeats}/${newEventData.totalSeats}`);
 
     // Limpieza: eliminar el evento y comprobar que desaparece
