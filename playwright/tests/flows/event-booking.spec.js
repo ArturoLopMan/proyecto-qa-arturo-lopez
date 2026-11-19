@@ -1,4 +1,5 @@
 import { test, expect, DEFAULT_TICKETS } from '../fixture';
+import { formatPrice } from '../utils/price-helpers';
 
 test.describe('Flujo transaccional', () => {
   test('CP-FLOW-01: evento creado se reserva y la reserva aparece en mis reservas', async ({
@@ -23,7 +24,7 @@ test.describe('Flujo transaccional', () => {
     await test.step('Reservar el evento creado', async () => {
       await eventsPage.openEvents();
       await eventsPage.bookEvent(newEventData.title);
-      await expect(bookingPage.ticketPriceLabel).toHaveText(`$${newEventData.price}`);
+      await expect(bookingPage.ticketPriceLabel).toHaveText(formatPrice(newEventData.price));
 
       await bookingPage.addTickets(bookingData.extraTickets);
       await bookingPage.fillCustomerDetails(bookingData);
@@ -31,7 +32,7 @@ test.describe('Flujo transaccional', () => {
 
       await expect(bookingPage.bookingRefLabel).toBeVisible();
       bookingRef = (await bookingPage.bookingRefLabel.textContent()).trim();
-      await expect(bookingPage.getFieldValue('Total')).toHaveText(`$${expectedTotal}`);
+      await expect(bookingPage.getFieldValue('Total')).toHaveText(formatPrice(expectedTotal));
     });
 
     await test.step('Verificar la reserva en mis reservas', async () => {
@@ -43,7 +44,7 @@ test.describe('Flujo transaccional', () => {
       await myBookingsPage.openBookingDetails(bookingRef);
       await expect(bookingDetailPage.getEventTitle(newEventData.title)).toBeVisible();
       await expect(bookingDetailPage.getFieldValue('Tickets')).toHaveText(String(totalTickets));
-      await expect(bookingDetailPage.getFieldValue('Total Paid')).toHaveText(`$${expectedTotal}`);
+      await expect(bookingDetailPage.getFieldValue('Total Paid')).toHaveText(formatPrice(expectedTotal));
     });
 
     await test.step('Verificar que se descontaron los asientos', async () => {

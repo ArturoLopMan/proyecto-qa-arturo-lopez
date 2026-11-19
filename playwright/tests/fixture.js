@@ -7,6 +7,7 @@ import { BookingDetailPage } from '../pages/BookingDetailPage';
 import NEW_EVENT from '../test-data/new-event.json';
 import { getFutureDateTime } from './utils/date-helpers';
 import { ManageEventsPage } from '../pages/ManageEventsPage';
+import { formatPrice } from './utils/price-helpers';
 
 // El formulario de reserva arranca con 1 ticket
 export const DEFAULT_TICKETS = 1;
@@ -111,10 +112,11 @@ storageState: async ({ eventhubStorageState }, use) => {
   },
 
   // Precondición: deja una reserva hecha y entrega sus datos
-  createdBooking: async ({ eventsPage, bookingPage, bookingData }, use) => {
-    await eventsPage.bookFirstAvailableEvent();
-    await expect(bookingPage.ticketPriceLabel).toHaveText(/\$\d+/);
-    const ticketPrice = await bookingPage.getTicketPrice();
+  createdBooking: async ({ eventsPage, bookingPage, bookingData, createdEvent }, use) => {
+    await eventsPage.openEvents();
+    await eventsPage.bookEvent(createdEvent.title);
+    await expect(bookingPage.ticketPriceLabel).toHaveText(formatPrice(createdEvent.price));
+    const ticketPrice = createdEvent.price;
 
     await bookingPage.addTickets(bookingData.extraTickets);
     await bookingPage.fillCustomerDetails(bookingData);
@@ -125,6 +127,14 @@ storageState: async ({ eventhubStorageState }, use) => {
     const tickets = DEFAULT_TICKETS + bookingData.extraTickets;
 
     await use({ ...bookingData, bookingRef, tickets, ticketPrice, total: ticketPrice * tickets });
+  },
+
+  // Precondición: un evento propio para el test (se elimina al final con el teardown de newEventData)
+  createdEvent: async ({ manageEventsPage, newEventData }, use) => {
+    await manageEventsPage.openManageEvents();
+    await manageEventsPage.createEvent(newEventData);
+    await expect(manageEventsPage.getEventRow(newEventData.title)).toBeVisible();
+    await use(newEventData);
   },
 
 });

@@ -1,4 +1,5 @@
 import { test, expect } from '../fixture';
+import { formatPrice } from '../utils/price-helpers';
 
 test.describe('Mis reservas', () => {
   test('CP-BOOK-02: el detalle de una reserva creada muestra sus datos', async ({
@@ -12,7 +13,7 @@ test.describe('Mis reservas', () => {
     const bookingCard = myBookingsPage.getBookingCard(createdBooking.bookingRef);
     await expect(bookingCard).toBeVisible();
     await expect(bookingCard.getByText(`${createdBooking.tickets} tickets`)).toBeVisible();
-    await expect(bookingCard.getByText(`$${createdBooking.total}`, { exact: true })).toBeVisible();
+    await expect(bookingCard.getByText(formatPrice(createdBooking.total), { exact: true })).toBeVisible();
 
     const eventName = (await bookingCard.getByRole('heading', { level: 3 }).textContent()).trim();
     const bookingId = (await bookingCard.getByTestId('booking-id').textContent()).trim().replace('#', '');
@@ -32,8 +33,8 @@ test.describe('Mis reservas', () => {
 
     // Payment Summary
     await expect(bookingDetailPage.getFieldValue('Tickets')).toHaveText(String(createdBooking.tickets));
-    await expect(bookingDetailPage.getFieldValue('Price per ticket')).toHaveText(`$${createdBooking.ticketPrice}`);
-    await expect(bookingDetailPage.getFieldValue('Total Paid')).toHaveText(`$${createdBooking.total}`);
+    await expect(bookingDetailPage.getFieldValue('Price per ticket')).toHaveText(formatPrice(createdBooking.ticketPrice));
+    await expect(bookingDetailPage.getFieldValue('Total Paid')).toHaveText(formatPrice(createdBooking.total));
 
     // Booking Information
     await expect(bookingDetailPage.getFieldValue('Booking ID')).toHaveText(`#${bookingId}`);
