@@ -20,6 +20,8 @@ export class ManageEventsPage {
     // Modal de eliminación
     this.deleteDialog = page.getByRole('dialog', { name: 'Delete this event?' });
     this.confirmDeleteButton = this.deleteDialog.getByTestId('confirm-dialog-yes');
+
+    this.cancelDeleteButton = this.deleteDialog.getByRole('button', { name: 'Cancel', exact: true });
   }
 
   async openManageEvents() {
@@ -43,8 +45,13 @@ export class ManageEventsPage {
     return this.eventRows.filter({ has: this.page.getByText(title, { exact: true }) });
   }
 
-  async deleteEvent(title) {
+  // Abre el modal de eliminación sin confirmar
+  async openDeleteDialog(title) {
     await this.getEventRow(title).getByTestId('delete-event-btn').click();
+  }
+
+  async deleteEvent(title) {
+    await this.openDeleteDialog(title);
     await this.confirmDeleteButton.click();
   }
   // Limpieza: elimina el evento solo si existe (por si el test falló antes de crearlo)
@@ -58,5 +65,9 @@ async deleteEventIfExists(title) {
   }
   await this.deleteEvent(title);
   await eventRow.waitFor({ state: 'detached' });
+}
+// Mensaje de validación que aparece en rojo bajo un campo
+getValidationMessage(message) {
+  return this.page.getByText(message, { exact: true });
 }
 }

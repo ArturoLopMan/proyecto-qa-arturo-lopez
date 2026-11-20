@@ -9,3 +9,6 @@ node_modules/
 .env
 playwright/playwright-report/
 playwright/test-results/
+playwright/playwright-report/
+playwright/test-results/
+playwright/results.json

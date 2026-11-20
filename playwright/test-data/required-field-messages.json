@@ -1,0 +1,8 @@
+[
+  "Title is required",
+  "City is required",
+  "Venue is required",
+  "Event date is required",
+  "Enter a valid price (≥ 0)",
+  "Must have at least 1 seat"
+]
