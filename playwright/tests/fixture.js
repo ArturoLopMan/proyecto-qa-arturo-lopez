@@ -8,6 +8,7 @@ import NEW_EVENT from '../test-data/new-event.json';
 import { getFutureDateTime } from './utils/date-helpers';
 import { ManageEventsPage } from '../pages/ManageEventsPage';
 import { formatPrice } from './utils/price-helpers';
+import BOOKING_DATA from '../test-data/booking-data.json';
 
 // El formulario de reserva arranca con 1 ticket
 export const DEFAULT_TICKETS = 1;
@@ -101,15 +102,10 @@ storageState: async ({ eventhubStorageState }, use) => {
     await use(new BookingDetailPage(authenticatedPage));
   },
 
-  // Datos de la reserva (se pueden sobrescribir en un test)
-  bookingData: async ({}, use) => {
-    await use({
-      name: 'Arturo Lopez',
-      email: 'arturoqa@gmail.com',
-      phone: '+51 999888111',
-      extraTickets: 1,
-    });
-  },
+  // Datos del cliente para la reserva (se pueden sobrescribir en un test)
+bookingData: async ({}, use) => {
+  await use({ ...BOOKING_DATA });
+},
 
   // Precondición: deja una reserva hecha y entrega sus datos
   createdBooking: async ({ eventsPage, bookingPage, bookingData, createdEvent }, use) => {

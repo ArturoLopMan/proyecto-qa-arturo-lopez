@@ -1,6 +1,8 @@
-export class BookingDetailPage {
+import { BasePage } from './BasePage';
+
+export class BookingDetailPage extends BasePage {
   constructor(page) {
-    this.page = page;
+    super(page);
     this.statusBadge = page.getByText('confirmed', { exact: true });
     this.cancelBookingButton = page.getByTestId('cancel-booking-btn');
   }
@@ -8,11 +10,5 @@ export class BookingDetailPage {
   getEventTitle(eventName) {
     return this.page.getByRole('heading', { name: eventName });
   }
-
-  // Valor que aparece junto a una etiqueta (Name, Email, Tickets, Total Paid...)
-  getFieldValue(label) {
-    return this.page
-      .getByText(label, { exact: true })
-      .locator('xpath=following-sibling::*[1]');
-  }
+  
 }

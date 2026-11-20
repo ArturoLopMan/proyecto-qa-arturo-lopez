@@ -1,6 +1,8 @@
-export class BookingPage {
+import { BasePage } from './BasePage';
+
+export class BookingPage extends BasePage {
   constructor(page) {
-    this.page = page;
+    super(page);
 
     // Formulario de reserva
     this.addTicketButton = page.getByRole('button', { name: '+', exact: true });
@@ -35,12 +37,5 @@ export class BookingPage {
 
   async confirmBooking() {
     await this.confirmBookingButton.click();
-  }
-
-  // Valor que aparece junto a una etiqueta de la confirmación (Customer, Tickets, Total)
-  getFieldValue(label) {
-    return this.page
-      .getByText(label, { exact: true })
-      .locator('xpath=following-sibling::*[1]');
   }
 }
