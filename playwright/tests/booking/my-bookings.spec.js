@@ -14,9 +14,9 @@ test.describe('Mis reservas', () => {
     await expect(bookingCard).toBeVisible();
     await expect(bookingCard.getByText(`${createdBooking.tickets} tickets`)).toBeVisible();
     await expect(bookingCard.getByText(formatPrice(createdBooking.total), { exact: true })).toBeVisible();
-
-    const eventName = (await bookingCard.getByRole('heading', { level: 3 }).textContent()).trim();
+    await expect(bookingCard).toContainText(createdBooking.eventTitle);
     const bookingId = (await bookingCard.getByTestId('booking-id').textContent()).trim().replace('#', '');
+
 
     // Abrir el detalle
     await myBookingsPage.openBookingDetails(createdBooking.bookingRef);
@@ -24,7 +24,7 @@ test.describe('Mis reservas', () => {
 
     // Cabecera
     await expect(bookingDetailPage.statusBadge).toBeVisible();
-    await expect(bookingDetailPage.getEventTitle(eventName)).toBeVisible();
+    await expect(bookingDetailPage.getEventTitle(createdBooking.eventTitle)).toBeVisible();
 
     // Customer Details
     await expect(bookingDetailPage.getFieldValue('Name')).toHaveText(createdBooking.name);

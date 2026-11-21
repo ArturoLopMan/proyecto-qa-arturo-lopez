@@ -8,7 +8,7 @@ export class MyBookingsPage {
   getBookingCard(bookingRef) {
     return this.bookingCards.filter({ has: this.page.getByText(bookingRef, { exact: true }) });
   }
-
+  //abre detalles del evento
   async openBookingDetails(bookingRef) {
     await this.getBookingCard(bookingRef).getByRole('button', { name: 'View Details' }).click();
   }

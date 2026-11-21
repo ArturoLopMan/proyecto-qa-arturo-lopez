@@ -1,9 +1,9 @@
-import { test, expect } from "../fixture";
-import { formatPrice } from "../utils/price-helpers";
-import REQUIRED_FIELD_MESSAGES from "../../test-data/required-field-messages.json";
+import { test, expect } from '../fixture';
+import { formatPrice } from '../utils/price-helpers';
+import REQUIRED_FIELD_MESSAGES from '../../test-data/required-field-messages.json';
 
-test.describe("Gestión de eventos", () => {
-  test("CP-EVENT-01: evento creado con datos válidos aparece en la grilla y se puede eliminar", async ({
+test.describe('Gestión de eventos', () => {
+  test('CP-EVENT-01: evento creado con datos válidos aparece en la grilla y se puede eliminar', async ({
     manageEventsPage,
     newEventData,
   }) => {
@@ -20,11 +20,12 @@ test.describe("Gestión de eventos", () => {
       `${newEventData.totalSeats}/${newEventData.totalSeats}`,
     );
 
-    // Limpieza: eliminar el evento y comprobar que desaparece
+    // Eliminar el evento y comprobar que desaparece
     await manageEventsPage.deleteEvent(newEventData.title);
     await expect(eventRow).toHaveCount(0);
   });
-  test("CP-EVENT-02: cancelar la eliminación mantiene el evento en la grilla", async ({
+  
+  test('CP-EVENT-02: cancelar la eliminación mantiene el evento en la grilla', async ({
     manageEventsPage,
     createdEvent,
   }) => {
@@ -33,7 +34,7 @@ test.describe("Gestión de eventos", () => {
     // El modal advierte que se borrarán el evento y sus reservas
     await expect(manageEventsPage.deleteDialog).toBeVisible();
     await expect(manageEventsPage.deleteDialog).toContainText(
-      "permanently delete the event and all associated bookings",
+      'permanently delete the event and all associated bookings',
     );
 
     await manageEventsPage.cancelDeleteButton.click();
@@ -44,7 +45,7 @@ test.describe("Gestión de eventos", () => {
       manageEventsPage.getEventRow(createdEvent.title),
     ).toBeVisible();
   });
-  test("CP-EVENT-03: formulario vacío muestra los mensajes de los campos obligatorios", async ({
+  test('CP-EVENT-03: formulario vacío muestra los mensajes de los campos obligatorios', async ({
     manageEventsPage,
   }) => {
     await manageEventsPage.openManageEvents();
